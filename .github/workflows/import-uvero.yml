@@ -1,0 +1,56 @@
+name: Import and Build Uvero Base
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-uvero.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-build-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Uvero upstream
+        run: git clone --depth 1 https://github.com/sakethdevx/uvero.git upstream
+
+      - name: Push upstream source to uvero-base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd upstream
+          rm -rf .git
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b uvero-base
+          git add .
+          git commit -m "chore: import Uvero upstream base (MIT)"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin uvero-base
+
+      - name: Install dependencies
+        working-directory: upstream
+        run: npm ci --no-audit --no-fund
+
+      - name: Build Uvero for static preview
+        working-directory: upstream
+        run: npm run build -- --base ./
+
+      - name: Publish compiled Uvero to uvero-live
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd upstream/dist
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b uvero-live
+          git add -A
+          git commit -m "deploy: Uvero toolbox preview"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin uvero-live
