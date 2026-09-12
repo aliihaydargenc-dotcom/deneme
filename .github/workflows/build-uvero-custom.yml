@@ -28,6 +28,21 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Patch router for GitHub Pages subpath
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/App.jsx')
+          s = p.read_text(encoding='utf-8')
+          old = '<Router>'
+          new = '<Router basename={import.meta.env.BASE_URL}>'
+          if old not in s and new not in s:
+              raise SystemExit('Router tag not found')
+          if old in s:
+              s = s.replace(old, new, 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+
       - name: Build for GitHub Pages
         run: npm run build -- --base /deneme/
 
