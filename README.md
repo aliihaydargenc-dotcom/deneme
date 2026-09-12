@@ -1,58 +1,51 @@
-# Toolbox Web
+# Toolbox Web 🦀
 
-Tarayıcıda çalışan, local-first veri / dosya / developer araç kutusu. İlk sürüm mümkün olan işlemleri cihaz üzerinde yapar; sunucu zorunlu değildir.
+Tarayıcıda çalışan **local-first** veri / dosya / developer araç kutusu. Arayüz Vite + TypeScript, ağır işlemler Rust → WebAssembly çekirdeğiyle çalışır. WASM yüklenemezse uygulama TypeScript fallback ile kullanılmaya devam eder.
 
-## v0.1.0 çalışan araçlar
+## v0.2.0
 
-- CSV analiz, önizleme, duplicate tespiti ve temizleme
-- JSON format / minify / validate
-- Metin temizleme ve satır işlemleri
-- Metin workflow/pipeline builder
-- SHA-256 dosya hash
-- Görsel resize + PNG/JPEG/WebP dönüşümü
-- Base64 encode/decode
-- URL encode/decode
-- UUID v4 generator
-- Regex tester
-- Unix timestamp converter
-- Satır bazlı metin karşılaştırma
+- Gerçek Vite + TypeScript uygulama yapısı
+- Rust/WebAssembly çekirdeği
+- CSV profil + duplicate temizleme (Rust)
+- JSON pretty/minify (Rust)
+- Metin normalize / unique / sayaçlar (Rust)
+- SHA-256 dosya hash (Rust)
+- Workflow engine
+- Base64, URL, UUID, Regex, Timestamp araçları
 - Drag & drop dosya yönlendirme
-- Komut çubuğu (Ctrl/Cmd + K)
-- PWA/offline cache
-- Opsiyonel Rust/WebAssembly motoru
+- Local-first çalışma
+- GitHub Pages CI/CD
+- Fallback motoru için otomatik testler
 
-## Çalıştırma
-
-### En kolay
-`index.html` dosyasını tarayıcıda açın. Çoğu araç doğrudan çalışır.
-
-### Önerilen
-```bash
-python -m http.server 8080
-```
-Ardından `http://localhost:8080`.
-
-## Rust/WASM
-
-Rust çekirdeği `rust-core/` altındadır. Yerelde Rust + wasm-pack varsa:
+## Yerelde çalıştır
 
 ```bash
-wasm-pack build rust-core --target web --out-dir ../wasm-pkg
+npm install
+npm run dev
 ```
 
-Site, `wasm-pkg` bulunduğunda Rust/WASM motorunu otomatik algılar; bulunamazsa JavaScript fallback ile çalışır.
+Rust/WASM'i de yerelde etkinleştirmek için:
 
-## GitHub Pages
+```bash
+wasm-pack build rust-core --target web --out-dir ../wasm-pkg --release
+npm run dev
+```
 
-`.github/workflows/pages.yml` main branch push'unda Rust/WASM derler ve GitHub Pages artifact'ı üretir. Repo ayarlarında Pages kaynağını **GitHub Actions** olarak seçmek yeterlidir.
+> Rust/WASM paketi yoksa uygulama otomatik olarak TypeScript fallback kullanır.
 
-## Mimari yön
+## Production build
 
-v0.2: XLSX + daha güçlü tablo profilleme + işlem geçmişi  
-v0.3: DuckDB-WASM / Parquet / SQL workspace  
-v0.4: görsel workflow ve batch processing  
-v0.5: AI komut katmanı ve kayıtlı workflow şablonları
+```bash
+npm install
+npm test
+npm run build
+```
 
-## Gizlilik
+GitHub Actions, production sırasında Rust çekirdeğini de derleyip `dist/wasm-pkg` altına ekler.
 
-Local-first araçlarda dosya içeriği tarayıcıda işlenir. Gelecekte sunucu/AI gerektiren özellikler ayrı ve açık biçimde etiketlenecektir.
+## Yol haritası
+
+- v0.3 — XLSX/çoklu Excel, tablo profilleme, işlem geçmişi
+- v0.4 — DuckDB-WASM, Parquet ve SQL workspace
+- v0.5 — görsel workflow/batch processing
+- v0.6 — AI komut katmanı + kayıtlı workflow şablonları

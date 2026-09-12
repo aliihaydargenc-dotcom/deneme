@@ -15,15 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
       - name: Install wasm-pack
         run: cargo install wasm-pack --locked
       - name: Build Rust/WASM core
-        run: wasm-pack build rust-core --target web --out-dir ../wasm-pkg
-      - name: Prepare static artifact
+        run: wasm-pack build rust-core --target web --out-dir ../wasm-pkg --release
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Test TypeScript fallback
+        run: npm test
+      - name: Build Vite app
+        run: npm run build
+      - name: Add WASM package to dist
         run: |
-          mkdir -p dist
-          cp index.html styles.css app.js manifest.webmanifest service-worker.js dist/
           cp -r wasm-pkg dist/wasm-pkg
           touch dist/.nojekyll
       - uses: actions/configure-pages@v5
