@@ -1,4 +1,4 @@
-# Triggered import workflow for Uvero upstream
+# Import Uvero upstream as our toolbox base
 name: Import and Build Uvero Base
 
 on:
@@ -16,7 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Uvero upstream
-        run: git clone --depth 1 https://github.com/sakethdevx/uvero.git upstream
+        run: |
+          git clone --depth 1 https://github.com/sakethdevx/uvero.git upstream
+          rm -rf upstream/.github/workflows
 
       - name: Push upstream source to uvero-base
         env:
