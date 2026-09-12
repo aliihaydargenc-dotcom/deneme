@@ -1,0 +1,4 @@
+wasm-pkg/
+target/
+.DS_Store
+Thumbs.db
