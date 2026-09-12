@@ -5,6 +5,11 @@ import App from './App.jsx'
 import { AuthProvider } from './auth/AuthProvider'
 import { checkVersion } from './lib/versionCheck'
 import { initI18n } from './lib/i18n'
+import { initStaticClipboardApi } from './lib/staticClipboardApi'
+
+// GitHub Pages is static and cannot serve /api/clipboard. Install a local-only
+// compatibility layer before React mounts so clipboard pages never issue 405s.
+initStaticClipboardApi()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
