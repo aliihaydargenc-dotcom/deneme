@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="Toolbox Web — tarayıcıda çalışan gizlilik odaklı veri, dosya ve geliştirici araç kutusu." />
+  <title>Toolbox Web</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">TB</span><div><strong>Toolbox Web</strong><small>Local-first araç kutusu</small></div></div>
+    <div class="top-actions"><span id="engineBadge" class="badge">JS Engine</span><button id="themeBtn" class="icon-btn" aria-label="Tema değiştir">◐</button></div>
+  </header>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="privacy-card"><b>🔒 Local-first</b><span>Dosyalar desteklenen araçlarda cihazında işlenir.</span></div>
+      <nav id="categoryNav"></nav>
+      <div class="sidebar-foot">v0.1.0 MVP</div>
+    </aside>
+    <section class="content">
+      <div class="hero">
+        <div><p class="eyebrow">SWISS-ARMY KNIFE FOR THE WEB</p><h1>Dosyanı bırak. İşini seç. Sonucu al.</h1><p>CSV/JSON analizi, metin temizleme, görsel dönüştürme, hash, regex, Base64 ve daha fazlası — tek yerde.</p></div>
+        <div class="command-wrap"><input id="commandInput" type="search" placeholder="Ne yapmak istiyorsun? Örn: JSON düzenle, duplicate sil…" autocomplete="off" /><span>⌘ K</span></div>
+      </div>
+      <section class="drop-zone" id="dropZone">
+        <input id="fileInput" type="file" hidden />
+        <div class="drop-icon">⇧</div><h3>Dosyayı buraya sürükle</h3><p>CSV, JSON, TXT, PNG, JPG, WEBP</p>
+        <button id="pickFileBtn" class="primary">Dosya Seç</button><div id="fileInfo" class="file-info"></div>
+      </section>
+      <div class="section-head"><div><h2>Araçlar</h2><p id="toolCountText"></p></div><input id="toolSearch" type="search" placeholder="Araç ara…" /></div>
+      <div id="toolGrid" class="tool-grid"></div>
+    </section>
+  </main>
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><div class="modal-head"><div><span id="modalIcon" class="modal-icon"></span><div><h2 id="modalTitle"></h2><p id="modalDesc"></p></div></div><button id="closeModal" class="icon-btn">✕</button></div><div id="toolBody" class="tool-body"></div></div></div>
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
