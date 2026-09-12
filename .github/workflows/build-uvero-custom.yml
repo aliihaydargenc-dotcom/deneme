@@ -2,7 +2,9 @@ name: Build Customized Uvero
 
 on:
   push:
-    branches: [uvero-base]
+    branches: [main]
+    paths:
+      - '.github/workflows/build-uvero-custom.yml'
   workflow_dispatch:
 
 permissions:
