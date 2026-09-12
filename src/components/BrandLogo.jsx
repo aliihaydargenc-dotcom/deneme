@@ -14,6 +14,8 @@ export default function BrandLogo({
   textClassName = 'text-2xl sm:text-[26px]',
   label = 'Uvero',
 }) {
+  const logoUrl = `${import.meta.env.BASE_URL}file.svg`
+
   return (
     <div className={`inline-flex items-center gap-2 ${className}`} aria-label={label}>
       <span
@@ -21,8 +23,8 @@ export default function BrandLogo({
         className={`${iconClassName} ${colorClassName}`}
         style={{
           backgroundColor: 'currentColor',
-          maskImage: 'url(/file.svg)',
-          WebkitMaskImage: 'url(/file.svg)',
+          maskImage: `url(${logoUrl})`,
+          WebkitMaskImage: `url(${logoUrl})`,
           maskRepeat: 'no-repeat',
           WebkitMaskRepeat: 'no-repeat',
           maskSize: 'contain',
