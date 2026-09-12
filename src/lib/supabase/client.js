@@ -64,7 +64,7 @@ function createOfflineSupabase() {
     }
 }
 
-if (!supabaseConfigured) {
+if (!supabaseConfigured && import.meta.env.DEV) {
     console.warn('Supabase environment variables are not set. Auth features are disabled, but the toolbox remains usable.')
 }
 
