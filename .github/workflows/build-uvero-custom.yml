@@ -46,6 +46,72 @@ jobs:
       - name: Build for GitHub Pages
         run: npm run build -- --base /deneme/
 
+      - name: Disable stale PWA cache on GitHub Pages
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          index = Path('dist/index.html')
+          html = index.read_text(encoding='utf-8')
+
+          # Do not register a new PWA worker on the GitHub Pages preview.
+          html = re.sub(
+              r'<script[^>]*id=["\']vite-plugin-pwa:register-sw["\'][^>]*></script>',
+              '',
+              html,
+              flags=re.IGNORECASE,
+          )
+
+          # New clients also proactively unregister any worker left by older builds.
+          cleanup = '''<script>
+          (function () {
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function () {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                  return Promise.all(regs.map(function (reg) { return reg.unregister(); }));
+                }).catch(function () {});
+              });
+            }
+            if ('caches' in window) {
+              window.addEventListener('load', function () {
+                caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+                }).catch(function () {});
+              });
+            }
+          })();
+          </script>'''
+          html = html.replace('</head>', cleanup + '\n</head>', 1)
+          index.write_text(html, encoding='utf-8')
+
+          # Existing registrations still request /deneme/sw.js. Replace it with a
+          # one-shot worker that deletes old caches, unregisters itself and reloads clients.
+          Path('dist/sw.js').write_text(r'''self.addEventListener('install', event => {
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', event => {
+            event.waitUntil((async () => {
+              const keys = await caches.keys();
+              await Promise.all(keys.map(key => caches.delete(key)));
+              await self.registration.unregister();
+              const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+              for (const client of windows) {
+                try { await client.navigate(client.url); } catch (_) {}
+              }
+            })());
+          });
+          self.addEventListener('fetch', event => {
+            event.respondWith(fetch(event.request));
+          });
+          ''', encoding='utf-8')
+
+          # registerSW.js must not re-register the kill-switch worker.
+          register = Path('dist/registerSW.js')
+          if register.exists():
+              register.unlink()
+          PY
+
       - name: Publish compiled site to uvero-live
         env:
           GH_TOKEN: ${{ github.token }}
