@@ -1,0 +1,219 @@
+/**
+ * Tool Registry
+ * Central registry for all available tools
+ * Makes it easy to add new tools and maintain routing
+ */
+
+import React from 'react';
+// Security & Codes
+import PasswordGenerator from './utility/password-generator/PasswordGenerator';
+import passwordGeneratorSEO from './utility/password-generator/seo.json';
+import HashGenerator from './utility/hash-generator/HashGenerator';
+import hashGeneratorSEO from './utility/hash-generator/seo.json';
+
+// Measurements & Time
+import UnitConverter from './utility/unit-converter/UnitConverter';
+import unitConverterSEO from './utility/unit-converter/seo.json';
+
+// Document Tools
+import MergePdfTool, { metadata as mergePdfMetadata } from './document/merge-pdf/index.jsx';
+import SplitPdfTool, { metadata as splitPdfMetadata } from './document/split-pdf/index.jsx';
+import RotatePdfTool, { metadata as rotatePdfMetadata } from './document/rotate-pdf/index.jsx';
+import DeletePdfTool, { metadata as deletePdfMetadata } from './document/delete-pdf/index.jsx';
+import ReorderPdfTool, { metadata as reorderPdfMetadata } from './document/reorder-pdf/index.jsx';
+import ExtractPdfTool, { metadata as extractPdfMetadata } from './document/extract-pdf/index.jsx';
+import CompressPdfTool, { metadata as compressPdfMetadata } from './document/compress-pdf/index.jsx';
+import DecryptPdfTool, { metadata as decryptPdfMetadata } from './document/decrypt-pdf/index.jsx';
+import ProtectPdfTool, { metadata as protectPdfMetadata } from './document/protect-pdf/index.jsx';
+import WatermarkPdfTool, { metadata as watermarkPdfMetadata } from './document/watermark-pdf/index.jsx';
+import CleanMetadataPdfTool, { metadata as cleanMetadataPdfMetadata } from './document/clean-metadata-pdf/index.jsx';
+import ImageToPdfTool, { metadata as imageToPdfMetadata } from './document/image-to-pdf/index.jsx';
+import PdfToImageTool, { metadata as pdfToImageMetadata } from './document/pdf-to-image/index.jsx';
+
+export const tools = {
+    // Document Tools
+    'merge-pdf': {
+        ...mergePdfMetadata,
+        description: 'Combine multiple PDF files into a single document easily.',
+        component: MergePdfTool,
+        popular: true,
+        seo: {
+            title: "Merge PDF | Uvero",
+            description: "Combine multiple PDF files into one quickly and securely in your browser."
+        }
+    },
+    'split-pdf': {
+        ...splitPdfMetadata,
+        description: 'Split a PDF file into multiple documents based on page ranges.',
+        component: SplitPdfTool,
+        popular: true,
+        seo: {
+            title: "Split PDF | Uvero",
+            description: "Split PDF files into multiple documents quickly and securely in your browser."
+        }
+    },
+    'rotate-pdf': {
+        ...rotatePdfMetadata,
+        description: 'Rotate specific pages or all pages in a PDF document.',
+        component: RotatePdfTool,
+        popular: true,
+        seo: {
+            title: "Rotate PDF | Uvero",
+            description: "Rotate PDF pages quickly and securely in your browser."
+        }
+    },
+    'delete-pdf': {
+        ...deletePdfMetadata,
+        description: 'Delete specific pages from a PDF document.',
+        component: DeletePdfTool,
+        popular: true,
+        seo: {
+            title: "Delete PDF Pages | Uvero",
+            description: "Delete pages from PDF documents quickly and securely in your browser."
+        }
+    },
+    'reorder-pdf': {
+        ...reorderPdfMetadata,
+        description: 'Reorder pages in a PDF document using drag-and-drop.',
+        component: ReorderPdfTool,
+        popular: true,
+        seo: {
+            title: "Reorder PDF Pages | Uvero",
+            description: "Reorder pages in PDF documents quickly and securely in your browser."
+        }
+    },
+    'extract-pdf': {
+        ...extractPdfMetadata,
+        description: 'Extract specific pages from a PDF document.',
+        component: ExtractPdfTool,
+        popular: true,
+        seo: {
+            title: "Extract PDF Pages | Uvero",
+            description: "Extract specific pages from PDF documents quickly and securely in your browser."
+        }
+    },
+    'compress-pdf': {
+        ...compressPdfMetadata,
+        description: 'Compress a PDF file to reduce its file size.',
+        component: CompressPdfTool,
+        popular: true,
+        seo: {
+            title: "Compress PDF | Uvero",
+            description: "Compress PDF files to reduce size while maintaining readability, all locally in your browser."
+        }
+    },
+    'decrypt-pdf': {
+        ...decryptPdfMetadata,
+        description: 'Unlock a password-protected PDF file.',
+        component: DecryptPdfTool,
+        popular: true,
+        seo: {
+            title: "Unlock PDF | Uvero",
+            description: "Remove password protection from PDF files securely in your browser."
+        }
+    },
+    'protect-pdf': {
+        ...protectPdfMetadata,
+        description: 'Encrypt a PDF file with a password and set permissions.',
+        component: ProtectPdfTool,
+        popular: true,
+        seo: {
+            title: "Protect PDF | Uvero",
+            description: "Encrypt and password protect PDF files securely in your browser."
+        }
+    },
+    'watermark-pdf': {
+        ...watermarkPdfMetadata,
+        description: 'Add a text watermark to a PDF document.',
+        component: WatermarkPdfTool,
+        popular: true,
+        seo: {
+            title: "Watermark PDF | Uvero",
+            description: "Add custom text watermarks to your PDF files securely in your browser."
+        }
+    },
+    'clean-metadata-pdf': {
+        ...cleanMetadataPdfMetadata,
+        description: 'Remove and sanitize metadata from a PDF file.',
+        component: CleanMetadataPdfTool,
+        popular: true,
+        seo: {
+            title: "Clean PDF Metadata | Uvero",
+            description: "Securely view and remove metadata, author info, and properties from PDF files in your browser."
+        }
+    },
+    'image-to-pdf': {
+        ...imageToPdfMetadata,
+        description: 'Convert and combine images into a PDF file.',
+        component: ImageToPdfTool,
+        popular: true,
+        seo: {
+            title: "Image to PDF | Uvero",
+            description: "Securely convert and combine JPG, PNG, and other images into PDF files offline in your browser."
+        }
+    },
+    'pdf-to-image': {
+        ...pdfToImageMetadata,
+        description: 'Export PDF pages as PNG, JPG, or WEBP images.',
+        component: PdfToImageTool,
+        popular: true,
+        seo: {
+            title: "PDF to Image | Uvero",
+            description: "Securely export PDF pages as PNG, JPG, or WEBP images offline in your browser."
+        }
+    },
+
+    // Image Utilities
+    // Image Utilities
+
+
+    // Security & Codes
+    'password-generator': {
+        id: 'password-generator',
+        name: 'Password Generator',
+        description: 'Generate strong, random passwords with customizable options',
+        component: PasswordGenerator,
+        category: 'security',
+        seo: passwordGeneratorSEO,
+        icon: '🔐',
+        popular: true,
+    },
+    'hash-generator': {
+        id: 'hash-generator',
+        name: 'Hash Generator',
+        description: 'Generate MD5, SHA-1, SHA-256, and other hashes',
+        component: HashGenerator,
+        category: 'security',
+        seo: hashGeneratorSEO,
+        icon: '🔒',
+        popular: false,
+    },
+
+    // Measurements & Time
+    'unit-converter': {
+        id: 'unit-converter',
+        name: 'Unit Converter',
+        description: 'Convert between length, weight, temperature, timezones, and other units',
+        component: UnitConverter,
+        category: 'measurements',
+        seo: unitConverterSEO,
+        icon: '📏',
+        popular: true,
+    }
+};
+
+const enhanceTool = (tool) => tool;
+
+export const getToolById = (id) => {
+    const tool = tools[id];
+    return enhanceTool(tool) || null;
+};
+
+export function getToolsByCategory(categoryId) {
+    return Object.values(tools).filter((tool) => tool.category === categoryId);
+}
+
+export function getPopularTools(limit = 3) {
+    const popular = Object.values(tools).filter((tool) => tool.popular);
+    return popular.slice(0, limit);
+}

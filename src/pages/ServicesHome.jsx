@@ -1,0 +1,186 @@
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useSEO from '../hooks/useSEO';
+import CommandBar from '../components/CommandBar';
+import ActionPanel from '../components/ActionPanel';
+import OnboardingHint from '../components/OnboardingHint';
+import { resolveIntent } from '../lib/IntentEngine';
+import { useInteraction } from '../lib/InteractionContext';
+import { useHomepagePreference, HOMEPAGE_PREFS } from '../lib/useHomepagePreference';
+
+/**
+ * ServicesHome — The Intelligence Interface.
+ * Single-viewport homepage: greeting + command bar + inline action panel + action chips.
+ * Zero scroll on desktop, minimal on mobile.
+ */
+
+const ACTION_CHIPS = [
+  { label: 'Convert files', icon: '⚡', path: '/toolbox', capability: 'file-convert' },
+  { label: 'File transfer', icon: '📡', path: '/file-transfer' },
+  { label: 'Generate QR', icon: '🔳', path: '/qr-tools', capability: 'qr-generate-quick' },
+  { label: 'Share text', icon: '📋', path: '/clipboard', capability: 'clipboard-share' },
+  { label: 'Run code', icon: '💻', path: '/compiler' },
+];
+
+export default function ServicesHome() {
+  const [activeIntent, setActiveIntent] = useState(null);
+  const [externalQuery, setExternalQuery] = useState('');
+  const [showDoneConfirm, setShowDoneConfirm] = useState(false);
+  const { setPreference } = useHomepagePreference();
+  const { interactionState, setInteractionState } = useInteraction();
+  const navigate = useNavigate();
+
+  useSEO({
+    title: 'Uvero — Intelligent Digital Tools',
+    description: 'Uvero resolves your digital tasks through a single command interface. Convert files, generate QR codes, share text, and more — all privately in your browser.',
+    keywords: ['file converter', 'QR generator', 'clipboard', 'AI tools', 'intelligent assistant'],
+  });
+
+  const handleIntentResolved = useCallback((intent) => {
+    setActiveIntent(intent);
+    setShowDoneConfirm(false);
+  }, []);
+
+  // Listen for external intent triggers (from History/Favorites)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail) {
+        handleIntentResolved(e.detail);
+      }
+    };
+    window.addEventListener('uvero-trigger-intent', handler);
+    return () => window.removeEventListener('uvero-trigger-intent', handler);
+  }, [handleIntentResolved]);
+
+  const handleDismissAction = useCallback(() => {
+    setActiveIntent(null);
+    setInteractionState('idle');
+    // Brief "✓ Done" confirmation before chips reappear
+    setShowDoneConfirm(true);
+    setTimeout(() => setShowDoneConfirm(false), 1800);
+  }, [setInteractionState]);
+
+  const handleChipClick = useCallback((chip) => {
+    if (chip.capability) {
+      const result = resolveIntent(chip.label);
+      if (result.capability && result.tier <= 2 && result.handler) {
+        setActiveIntent({
+          capability: result.capability,
+          params: result.params || {},
+          label: result.label,
+          description: result.description,
+          tier: result.tier,
+          handler: result.handler,
+          navigateTo: result.navigateTo,
+        });
+        return;
+      }
+    }
+    navigate(chip.path);
+  }, [navigate]);
+
+  const handleOnboardingExample = useCallback((text) => {
+    setExternalQuery(text);
+  }, []);
+
+  useEffect(() => {
+    if (activeIntent && interactionState !== 'action') {
+      setInteractionState('action');
+    } else if (!activeIntent && interactionState === 'action') {
+      setInteractionState('idle');
+    }
+  }, [activeIntent, setInteractionState, interactionState]);
+
+  const isInteracting = Boolean(activeIntent);
+  const isFaded = Boolean(activeIntent);
+  const fadeClass = isFaded ? 'ui-faded' : '';
+
+  return (
+    <div className={`premium-home ${isInteracting ? 'premium-home-interacting' : ''} relative flex flex-1 flex-col items-center justify-center min-h-[calc(100dvh-8rem)] px-4 pb-24 md:min-h-0 md:pb-6`}>
+
+      {/* ── Main content — vertically centered ── */}
+      <div className={`premium-home-content relative z-10 w-full ${isInteracting ? 'max-w-3xl gap-4' : 'max-w-xl gap-5'} mx-auto flex flex-col items-center`}>
+        {/* Preference Badge / Quick Switcher */}
+        {!isInteracting && (
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium glass-panel border border-[var(--border)] shadow-sm mb-1 animate-fade-in">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+            <span style={{ color: 'var(--text-secondary)' }}>Command Mode Active</span>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <button
+              onClick={() => setPreference(HOMEPAGE_PREFS.VISUAL)}
+              className="hover:underline flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 transition-colors"
+              title="Switch to Visual Catalog Homepage"
+            >
+              <span>🗂️ Switch to Visual Catalog</span>
+            </button>
+          </div>
+        )}
+
+        {/* Greeting */}
+        <div className="hero-copy text-center max-w-sm mx-auto mb-4">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight intelligence-text">
+            Tell me what to do or choose a suggestion.
+          </h1>
+        </div>
+
+        {/* Command Bar — externalQuery lets onboarding inject example text */}
+        <CommandBar
+          mode="embed"
+          onIntentResolved={handleIntentResolved}
+          externalQuery={externalQuery}
+          onExternalQueryConsumed={() => setExternalQuery('')}
+        />
+
+        {/* Onboarding Hint — inline, non-blocking, first-visit only */}
+        <div className={`focus-fade-wrap transition-ui ${fadeClass}`}>
+          <OnboardingHint onExampleSelect={handleOnboardingExample} />
+        </div>
+
+        {/* Post-action micro-confirmation */}
+        {showDoneConfirm && !activeIntent && (
+          <div className="success-highlight flex items-center gap-2 text-sm font-medium animate-state-in"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Done — what&apos;s next?
+          </div>
+        )}
+
+        {/* Action Chips */}
+        {!activeIntent && (
+          <div className={`flex flex-wrap justify-center gap-2 animate-fade-in transition-ui ${fadeClass}`}>
+            {ACTION_CHIPS.map((chip) => (
+              <button
+                key={chip.label}
+                onClick={() => handleChipClick(chip)}
+                className="action-chip text-gray-700 dark:text-gray-300"
+              >
+                <span>{chip.icon}</span>
+                <span>{chip.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Stats line */}
+        {!activeIntent && (
+          <p className={`text-xs font-medium tracking-wide animate-fade-in transition-ui ${fadeClass}`}
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            4 capabilities · 200+ actions · 100% private
+          </p>
+        )}
+      </div>
+
+      {/* Action Panel (appears when intent is resolved) */}
+      {activeIntent && (
+        <ActionPanel
+          intent={activeIntent}
+          onDismiss={handleDismissAction}
+        />
+      )}
+    </div>
+  );
+}
